@@ -1,3 +1,3 @@
 #!/bin/sh
-swiftc -parse-as-library -emit-library CGraphics.swift -o ./lib/libCGraphics.so
-gcc -o main *.c -L`pwd`/lib/ -lCGraphics
+swiftc -parse-as-library -emit-library ./lib/CGraphics.swift -o ./lib/libCGraphics.so
+gcc -o example example.c -L./lib/ -lCGraphics
