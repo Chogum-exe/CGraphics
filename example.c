@@ -1,23 +1,52 @@
 /**
- * @author    Sorgum
  * 
- * @brief     I am suffering
- *            Update I have managed to call swift functions
- *            This is done by linking to a dylib made in swift
- *            The @_cdecl("func_name") attribute which exposes
- *            a demangled symbol to the function and makes that
- *            demangled version follow the c calling convention
+ * @file    example.c
+ * @author  Soham B.
+ *
+ * @brief   Using objective-c runtime to interact with objects
+ * 
+ * @cite    https://stackoverflow.com/questions/30269329/creating-a-windowed-application-in-pure-c-on-macos
+ * 
+ * @bug     No known bugs
  */
 
 #include <stdio.h>
-#include "lib/CGraphics.h"
+#include <unistd.h>
+#include <Carbon/Carbon.h>
+#include <objc/objc-runtime.h>
+
+#define msg ((id (*)(id, SEL, ...))objc_msgSend)
+#define class_msg ((id (*)(Class, SEL, ...))objc_msgSend)
+
+typedef enum NSWindowStyleMask {
+  NSWindowStyleMaskBorderless = 0,
+  NSWindowStyleMaskTitled = 1,
+  NSWindowStyleMaskClosable = 2,
+  NSWindowStyleMaskMiniaturizable = 4,
+  NSWindowStyleMaskResizable = 8
+} NSWindowStyleMask;
 
 int main(void) {
 
-  cross_world();
-  printf("Hello!? we can confirm we are working in C!\n");
-  printf("Testing swift add -> 1+1=%d\n", add(1,1));
-  printf("Testing swift add -> 12+-3=%d\n", add(12,-3));
+  id app = class_msg(objc_getClass("NSApplication"), sel_getUid("shared"));
+  
+  id window = class_msg(objc_getClass("NSWindow"), sel_getUid("initWithContentRect:styleMask:backing:defer:"),
+  (struct CGRect) {{50, 50}, {800, 600}},
+  NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable,
+  2,
+  0);
+
+  int time_passed = 0;
+  while (time_passed < 60) {
+
+    printf("Running\n");
+
+    sleep(1);
+    ++time_passed;
+  }
+
+  object_dispose(app);
+  object_dispose(window);
 
   return 0;
 }
