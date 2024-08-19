@@ -7,7 +7,7 @@
  * 
  * @cite    https://stackoverflow.com/questions/30269329/creating-a-windowed-application-in-pure-c-on-macos
  * 
- * @bug     No known bugs
+ * @bug     Window no show up
  */
 
 #include <stdio.h>
@@ -26,15 +26,22 @@ typedef enum NSWindowStyleMask {
   NSWindowStyleMaskResizable = 8
 } NSWindowStyleMask;
 
+typedef enum NSBackingStoreType {
+    NSBackingStoreBuffered = 2,
+} NSBackingStoreType;
+
 int main(void) {
 
-  id app = class_msg(objc_getClass("NSApplication"), sel_getUid("shared"));
+  id app = class_msg(objc_getClass("NSApplication"), sel_getUid("sharedApplication"));
   
-  id window = class_msg(objc_getClass("NSWindow"), sel_getUid("initWithContentRect:styleMask:backing:defer:"),
-  (struct CGRect) {{50, 50}, {800, 600}},
+  id window = class_createInstance(objc_getClass("NSWindow"), 0);
+  msg(window, sel_getUid("initWithContentRect:styleMask:backing:defer:"),
+  (CGRect) {{50, 50}, {800, 600}},
   NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable,
-  2,
+  NSBackingStoreBuffered,
   0);
+
+  msg(window, sel_getUid("orderFrontRegardless"));
 
   int time_passed = 0;
   while (time_passed < 60) {
